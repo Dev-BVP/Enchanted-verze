@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Roblox Group Developers & Games</title>
+  <title>Roblox Developers & Games</title>
   <style>
     body { font-family: Arial; background-color: #f0f2f5; color: #333; padding: 20px; }
     h1, h2 { text-align: center; }
@@ -16,7 +16,8 @@
   </style>
 </head>
 <body>
-  <h1>Roblox Group Developers & Games</h1>
+  <h1>Roblox Developers & Games</h1>
+
   <h2>Developers</h2>
   <div class="grid" id="developers"></div>
 
@@ -24,76 +25,44 @@
   <div class="grid" id="games"></div>
 
   <script>
-    const GROUP_ID = "YOUR_GROUP_ID_HERE"; // replace with actual group ID
+    // Pre-fetched static data (avatars and thumbnails)
+    const developers = [
+      { id: 5758733865, role: "Owner", avatar: "https://www.roblox.com/headshot-thumbnail/image?userId=5758733865&width=100&height=100&format=png" },
+      { id: 905405935, role: "Manager", avatar: "https://www.roblox.com/headshot-thumbnail/image?userId=905405935&width=100&height=100&format=png" },
+      { id: 3969738792, role: "Scripter", avatar: "https://www.roblox.com/headshot-thumbnail/image?userId=3969738792&width=100&height=100&format=png" },
+      { id: 7573240188, role: "Builder", avatar: "https://www.roblox.com/headshot-thumbnail/image?userId=7573240188&width=100&height=100&format=png" },
+      { id: 8235990735, role: "Artist", avatar: "https://www.roblox.com/headshot-thumbnail/image?userId=8235990735&width=100&height=100&format=png" },
+      { id: 5420352582, role: "Tester", avatar: "https://www.roblox.com/headshot-thumbnail/image?userId=5420352582&width=100&height=100&format=png" },
+      { id: 5051632743, role: "UI Designer", avatar: "https://www.roblox.com/headshot-thumbnail/image?userId=5051632743&width=100&height=100&format=png" },
+      { id: 4157303992, role: "Sound Designer", avatar: "https://www.roblox.com/headshot-thumbnail/image?userId=4157303992&width=100&height=100&format=png" }
+    ];
+
+    const games = [
+      { id: 78655195585445, name: "Main Game", thumbnail: "https://www.roblox.com/asset-thumbnail/image?assetId=78655195585445&width=150&height=150&format=png" }
+      // Add more games here manually if needed
+    ];
 
     const devContainer = document.getElementById("developers");
     const gameContainer = document.getElementById("games");
 
-    async function fetchGroupMembers() {
-      const response = await fetch(`https://groups.roblox.com/v1/groups/${GROUP_ID}/roles`);
-      const rolesData = await response.json();
-      const allMembers = [];
+    developers.forEach(dev => {
+      const div = document.createElement("div");
+      div.className = "card";
+      div.innerHTML = `<img src="${dev.avatar}" alt="User ${dev.id}"><div class="role">${dev.role}</div>`;
+      devContainer.appendChild(div);
+    });
 
-      for (const role of rolesData.roles) {
-        let page = 1;
-        let hasNext = true;
-        while(hasNext){
-          const res = await fetch(`https://groups.roblox.com/v1/groups/${GROUP_ID}/roles/${role.id}/users?limit=100&sortOrder=Asc&cursor=${page>1?page:''}`);
-          const data = await res.json();
-          data.data.forEach(member => allMembers.push({id: member.user.id, role: role.name}));
-          hasNext = data.nextPageCursor != null;
-          page++;
-        }
-      }
-
-      return allMembers;
-    }
-
-    async function displayMembers() {
-      const members = await fetchGroupMembers();
-      for (const dev of members) {
-        const thumbResp = await fetch(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${dev.id}&size=100x100&format=Png&isCircular=true`);
-        const thumbData = await thumbResp.json();
-        const avatarUrl = thumbData.data[0]?.imageUrl || "";
-
-        const div = document.createElement("div");
-        div.className = "card";
-        div.innerHTML = `
-          <img src="${avatarUrl}" alt="User ${dev.id}">
-          <div class="role">${dev.role}</div>
-        `;
-        devContainer.appendChild(div);
-      }
-    }
-
-    async function fetchGroupGames() {
-      const response = await fetch(`https://games.roblox.com/v1/groups/${GROUP_ID}/games?limit=100`);
-      const data = await response.json();
-      return data.data.map(game => ({id: game.universeId, name: game.name}));
-    }
-
-    async function displayGames() {
-      const games = await fetchGroupGames();
-      for (const game of games) {
-        const thumbResp = await fetch(`https://thumbnails.roblox.com/v1/games/icons?universeIds=${game.id}&size=150x150&format=Png`);
-        const thumbData = await thumbResp.json();
-        const gameThumb = thumbData.data[0]?.imageUrl || "";
-
-        const div = document.createElement("div");
-        div.className = "card game-card";
-        div.innerHTML = `
-          <a href="https://www.roblox.com/games/${game.id}" target="_blank">
-            <img src="${gameThumb}" alt="${game.name}">
-            <div class="game-name">${game.name}</div>
-          </a>
-        `;
-        gameContainer.appendChild(div);
-      }
-    }
-
-    // Run both
-    displayMembers();
-    displayGames();
+    games.forEach(game => {
+      const div = document.createElement("div");
+      div.className = "card game-card";
+      div.innerHTML = `
+        <a href="https://www.roblox.com/games/${game.id}" target="_blank">
+          <img src="${game.thumbnail}" alt="${game.name}">
+          <div class="game-name">${game.name}</div>
+        </a>
+      `;
+      gameContainer.appendChild(div);
+    });
   </script>
 </body>
 </html>
